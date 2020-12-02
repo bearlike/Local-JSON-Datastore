@@ -1,2 +1,5 @@
 # Local-JSON-Datastore
- A file-based JSON data store exposed as a library.
+[ Work in Progress ]
+
+### Introduction
+A file-based JSON data store exposed as a library.
