@@ -24,7 +24,8 @@ class Datastore:
         from time import sleep
         # Waits until another process completes it's process
         while os.path.isfile(self.db_path+".lock"):
-            print("Another process is using DB.json. Waiting for release.")
+            print("Another process is using",
+                    self.db_path, ". Waiting for release.")
             sleep(1)
         with open(self.db_path+".lock", 'w') as fp:
             pass
@@ -51,6 +52,7 @@ class Datastore:
         except FileNotFoundError:
             print("The file", self.db_path, "does not exist or inaccessible.")
             print(self.db_path, "Will be created on write")
+            self._unlock()
             return True
         except json.decoder.JSONDecodeError:
             print("File is either empty or corrupted.")
@@ -65,6 +67,13 @@ class Datastore:
         Returns:
             bool: Returns True upon successful write and False otherwise
         """
+        try:
+            from os.path import getsize
+            if getsize(self.db_path)/1024 > 1024**3:
+                print("File Size Limit reached (> 1 GB)")
+                return False
+        except FileNotFoundError:
+            pass
         try:
             self._lock()
             with open(self.db_path, "w") as outfile:
@@ -100,7 +109,7 @@ class Datastore:
         if self._json_to_dict():
             curr_time = datetime.now().timestamp()
             if(self.db_data[key][1]['expiration_time'] == -1) or \
-                (curr_time < self.db_data[key][1]['expiration_time']):
+                    (curr_time < self.db_data[key][1]['expiration_time']):
                 if key in self.db_data.keys():
                     return(self.db_data[key])
                 else:
@@ -193,3 +202,9 @@ class Datastore:
         else:
             print("Unable to add Object")
             return False
+
+
+if __name__ == "__main__":
+    print("This is a Package File meant to be imported in other python3 programs.\
+            \nVisit https://github.com/bearlike/Local-JSON-Datastore to understand more.\
+            \nOr Execute the test file to perform Automated Testing")

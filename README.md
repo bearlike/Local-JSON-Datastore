@@ -1,8 +1,13 @@
 # Local JSON Datastore
 
 ## Introduction
-A file-based JSON data store exposed as a library.
+A file-based JSON data store exposed as a library that supports CRD operations with a lock-unlock mechanism to establish a thread-safe environment.
+### Features
 
+- A Python package for an user to import and instantiate the class to perform **CRD** operations.
+- A lock-unlock mechanism to make the data store thread safe.
+- 85% Testing Coverage for the application using PyTest.
+- Read, Write and Delete operations performed on a custom local data store in a user-specified location.
 ### In-Progress
 - Currently Building Unit Test Modules
 ## Getting Started
@@ -26,7 +31,7 @@ cd Local-JSON-Datastore
 Import the package using the following command.
 
 ```python
-from datastore import Datastore
+import datastore
 ```
 
 #### Creating an object
@@ -34,13 +39,13 @@ from datastore import Datastore
 By default an object is created with the storage file called `DB.json` in the root of the present working directory as follows.
 
 ```python
-data_store = Datastore()
+db = datastore.Datastore()
 ```
 
 In case a file path is required it can be specified while instantiating the class.
 
 ```python
-data_store = Datastore(path="test/file/path")
+db = Datastore(path="test/file/path")
 ```
 
 #### Inserting an object
@@ -54,7 +59,7 @@ test_object = {
     'c':'cat',
     'd':'dog'
 }
-is_object_inserted = data_store.add_obj(key='alphabets', obj=test_object)
+is_object_inserted = db.add_obj(key='alphabets', obj=test_object)
 ```
 
  If an object has to be inserted with a specific **Time-To-Live** it can be passed as a separate argument (in seconds) to the add function. 
@@ -66,7 +71,7 @@ test_object = {
     'c':'cat',
     'd':'dog'
 }
-is_object_inserted = data_store.add_obj(key='alphabets', obj=test_object, life=100)
+is_object_inserted = db.add_obj(key='alphabets', obj=test_object, life=100)
 ```
 
 #### Deleting an Object
@@ -74,7 +79,7 @@ is_object_inserted = data_store.add_obj(key='alphabets', obj=test_object, life=1
 To delete an object that has not crossed its **Time-To-Live** the key of that object can be passed as an argument to the `delete_object()` function. Return `True` if the object has been deleted successfully else a `False`.
 
 ```python
-is_object_deleted = data_store.delete_object(key='alphabets')
+is_object_deleted = db.delete_object(key='alphabets')
 ```
 
 #### Retrieve an Object
@@ -82,7 +87,7 @@ is_object_deleted = data_store.delete_object(key='alphabets')
 To retrieve an object provide the key of the object as an argument to the `get_object()` function.
 
 ```python
-key = data_store.get_object(key='alphabet')
+key = db.get_object(key='alphabet')
 print(key)
 ```
 
