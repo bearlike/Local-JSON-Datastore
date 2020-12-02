@@ -9,6 +9,7 @@ class Datastore:
 
     def __init__(self, path: str = "DB.json"):
         """ Class Constructor
+        
         Args:
             path (str): Path to the JSON Datastore file
         """
@@ -21,16 +22,23 @@ class Datastore:
                 self.db_data = json.load(json_file)
             return True
         except FileNotFoundError:
-            print("The file", self.db_path, "does not exist or inaccessible")
-            print("Creating", self.db_path, "JSON Data store file")
+            print("The file", self.db_path, "does not exist or inaccessible.")
+            print(self.db_path, "Will be created on write")
+            return True
+        except json.decoder.JSONDecodeError:
+            print("File is either empty or corrupted.")
             return False
         except:
             print("Unable to read", self.db_path)
             return False
 
     def dict_to_json(self) -> bool:
-        with open(self.db_path, "w") as outfile:
-            json.dump(self.db_data, outfile)
+        try:
+            with open(self.db_path, "w") as outfile:
+                json.dump(self.db_data, outfile)
+            return True
+        except:
+            return False
 
     def print_all_objects(self) -> bool:
         if self.json_to_dict():
@@ -40,19 +48,29 @@ class Datastore:
             print("Unable to Print all JSON Objects")
             return False
 
-    def delete_object(self, id: int) -> bool:
+    def Delete(self, key: int) -> bool:
         if self.json_to_dict():
             try:
-                self.db_data.pop(id)
+                self.db_data.pop(key)
             except KeyError:
-                print("Object with", id, "does not exist.")
+                print("Object with", key, "does not exist.")
                 return False
             return True
         else:
             print("Unable to delete Object ID =", id)
             return False
 
-    def add_obj(self, obj: dict, life: int = -1):
+    def Create(self, key: str, obj: dict, life: int = -1):
+        """ Create and pushes object to the JSON DS
+
+        Args:
+            key (str): Primary Key for the $obj 
+            obj (dict): The Dictionary object to be pushed
+            life (int, optional): Time in Seconds the key is retained in the DS. Defaults to -1.
+
+        Returns:
+            bool: Returns True upon successful insertion
+        """
         if self.json_to_dict():
             from datetime import datetime, timedelta
             from random import randint
@@ -64,31 +82,33 @@ class Datastore:
                 return False
 
             # Check if the Key length limit is reached
-            for key in obj.keys():
-                if len(key) > 32:
-                    print("Object contains Key(s) with more than 32 Characters.")
-                    return False
+            if len(key) > 32:
+                print("Object contains Key(s) with more than 32 Characters.")
+                return False
 
-            # Generate Current UTC Time
+            # Determining Current and Expiration Time 
             curr_time = datetime.now()
             if life == -1:
                 expiration_time = -1
             else:
                 expiration_time = curr_time + timedelta(seconds=life)
+                expiration_time = expiration_time.timestamp()
+            curr_time = curr_time.timestamp()
             ts = int(str(curr_time).replace(".", ""))
-            flag = False
-            while flag == False:
-                n = randint(1000, 9999) + ts
-                try:
-                    if dict[n]:
-                        flag = True
-                        meta_data = {
-                            'inserted_time': curr_time.timestamp(),
-                            'expiration_time': expiration_time.timestamp()
-                        }
-                        self.db_data[n] = (obj, meta_data)
-                except KeyError:
-                    pass
+
+            # Creating JSON Object
+            if key in self.db_data.keys():
+                print("Key already Exist. Object not Created.")
+                return False
+            else:
+                meta_data = {
+                    'inserted_time': curr_time,
+                    'expiration_time': expiration_time
+                }
+                self.db_data[key] = (obj, meta_data)
+            if not self.dict_to_json():
+                return False
+            print("Object created with ID =", key)
             return True
         else:
             print("Unable to add Object")
