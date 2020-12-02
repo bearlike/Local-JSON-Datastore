@@ -1,8 +1,10 @@
 # Local JSON Datastore
-![Work in Progress](https://img.shields.io/badge/-Work%20in%20Progress-red)
 
 ## Introduction
 A file-based JSON data store exposed as a library.
+
+### In-Progress
+- Currently Building Unit Test Modules
 ## Getting Started
 ### Requirements
 
@@ -13,7 +15,7 @@ This package required Python 3.x.x to run. Install python from [here](https://ww
 To get the package clone this repository into your local system and make it the current working directory using the following commands.
 
 ```bash
-https://github.com/bearlike/Local-JSON-Datastore.git
+git clone https://github.com/bearlike/Local-JSON-Datastore.git
 cd Local-JSON-Datastore
 ```
 
@@ -29,7 +31,7 @@ from datastore import Datastore
 
 #### Creating an object
 
-By default an object is created with the storage file called `db.json` in the root of the present working directory as follows.
+By default an object is created with the storage file called `DB.json` in the root of the present working directory as follows.
 
 ```python
 data_store = Datastore()
