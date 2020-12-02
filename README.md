@@ -1,15 +1,25 @@
-# Local JSON Datastore
+<h1 align="center">
+  <img alt="Local JSON Datastore" src="https://i.imgur.com/xmSiakK.png" />
+</h1>
+<p align="center">
+<a href="https://www.python.org/dev/peps/pep-0494/"><img title="Python3" src="https://img.shields.io/badge/Python-3-yellow"></a>
+<a href="https://travis-ci.com/github/bearlike/Local-JSON-Datastore"><img title="Travis CI: Build Status" src="https://api.travis-ci.com/bearlike/Local-JSON-Datastore.svg?branch=main"></a>
+<a href="LICENSE"><img title="License - MIT" src="https://img.shields.io/badge/License-MIT-brightgreen"></a>
+</p>
 
 ## Introduction
 A file-based JSON data store exposed as a library that supports CRD operations with a lock-unlock mechanism to establish a thread-safe environment.
-### Features
 
+### Features
 - A Python package for an user to import and instantiate the class to perform **CRD** operations.
-- A lock-unlock mechanism to make the data store thread safe.
-- 85% Testing Coverage for the application using PyTest.
-- Read, Write and Delete operations performed on a custom local data store in a user-specified location.
-### In-Progress
-- Currently Building Unit Test Modules
+- 85% Testing Coverage for the application using **PyTest** and deployed on [**Travis CI**](https://travis-ci.com/github/bearlike/Local-JSON-Datastore).
+- **Read, Write and Delet**e operations performed on a custom local data store in a user-specified location.
+- Completely **Thread Safe** between same-user and mult-user processes. 
+- A **lock-unlock mechanism** to make the data store thread safe.
+- Supports **Time-To-Live propert**y through argument **`life`** in **`database.database.Database.create()`**, defines the seconds the key must be retained in the data store. Once `life` for a key has expired, the key will no longer be available for Read or Delete operations.
+- **All Non-Functional Requirements staisfied**
+- **All functions inside the package and Unit Test modules have well defined docstring in them.** 
+
 ## Getting Started
 ### Requirements
 
@@ -100,3 +110,8 @@ print(key)
 }
 ```
 
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/bearlike">Krishna Alagiri</a>
+</p>
+
+![wave](http://cdn.thekrishna.in/img/common/border.png)
