@@ -17,8 +17,12 @@ class Datastore:
         self.db_data = dict()
 
     def _lock(self):
+        """ Create a file ($self.db_path.lock) to denote the DS is
+            being used by another process.
+        """
         import os
         from time import sleep
+        # Waits until another process completes it's process
         while os.path.isfile(self.db_path+".lock"):
             print("Another process is using DB.json. Waiting for release.")
             sleep(1)
@@ -26,10 +30,18 @@ class Datastore:
             pass
 
     def _unlock(self):
+        """ Deletes a file ($self.db_path.lock) that denotes the DS is
+            being used by another process.
+        """
         from os import remove
         remove(self.db_path + ".lock")
 
-    def json_to_dict(self) -> bool:
+    def _json_to_dict(self):
+        """ Reads the JSON file into a dictionary 
+
+        Returns:
+            bool: Returns True upon successful read and False otherwise
+        """
         try:
             self._lock()
             with open(self.db_path) as json_file:
@@ -47,7 +59,12 @@ class Datastore:
             print("Unable to read", self.db_path)
             return False
 
-    def dict_to_json(self) -> bool:
+    def _dict_to_json(self):
+        """ Writes the dictionary into a JSON file  
+
+        Returns:
+            bool: Returns True upon successful write and False otherwise
+        """
         try:
             self._lock()
             with open(self.db_path, "w") as outfile:
@@ -57,37 +74,64 @@ class Datastore:
         except:
             return False
 
-    def read(self, key: str):
-        if self.json_to_dict():
-            if key in self.db_data.keys():
-                return(self.db_data[key])
-            else:
-                return False
-        else:
-            return False
-                
-            
-    def _print_all_objects(self) -> bool:
-        if self.json_to_dict():
+    def _print_all_objects(self):
+        """ Prints all objects ignore Time-To-Live property
+
+        Returns:
+            bool: Returns True upon successful insertion and False otherwise        
+        """
+        if self._json_to_dict():
             print(json.dumps(self.db_data, indent=3))
             return True
         else:
             print("Unable to Print all JSON Objects")
             return False
 
-    def delete(self, key: str) -> bool:
-        if self.json_to_dict():
-            #print(self.db_data[key][1],"hello")
+    def read(self, key: str):
+        """ Return the requested Python object
+
+        Args:
+            key (str): Primary Key for the $obj
+
+        Returns:
+            dict: Upon success, returns the desired object
+            bool: Returns False upon runtime failiure
+        """
+        if self._json_to_dict():
+            curr_time = datetime.now().timestamp()
+            if(self.db_data[key][1]['expiration_time'] == -1) or \
+                (curr_time < self.db_data[key][1]['expiration_time']):
+                if key in self.db_data.keys():
+                    return(self.db_data[key])
+                else:
+                    print("Object with", key, "does not exist.")
+                    return False
+            else:
+                print("Object Life Expired")
+                return False
+        else:
+            return False
+
+    def delete(self, key: str):
+        """ Delete object with $key Key and pushes object to the JSON DS
+
+        Args:
+            key (str): Primary Key for the $obj
+
+        Returns:
+            bool: Returns True upon successful deletion and False otherwise
+        """
+        if self._json_to_dict():
             curr_time = datetime.now().timestamp()
             try:
-                print(curr_time , self.db_data[key][1]['expiration_time'])
-                if(self.db_data[key][1]['expiration_time']==-1):
+                if(self.db_data[key][1]['expiration_time'] == -1):
                     self.db_data.pop(key)
-                if (curr_time - self.db_data[key][1]['expiration_time']) < -1:
+                    return True
+                elif (curr_time > self.db_data[key][1]['expiration_time']):
                     print("Object Life Expired")
                     return False
                 self.db_data.pop(key)
-                if not self.dict_to_json():
+                if not self._dict_to_json():
                     return False
             except KeyError:
                 print("Object with", key, "does not exist.")
@@ -98,7 +142,7 @@ class Datastore:
             return False
 
     def create(self, key: str, obj: dict, life: int = -1):
-        """ Create and pushes object to the JSON DS
+        """ Create an object with $key Key and pushes object to the JSON DS
 
         Args:
             key (str): Primary Key for the $obj 
@@ -106,9 +150,9 @@ class Datastore:
             life (int, optional): Time in Secondsdele the key is retained in the DS. Defaults to -1.
 
         Returns:
-            bool: Returns True upon successful insertion
+            bool: Returns True upon successful insertion and False otherwise
         """
-        if self.json_to_dict():
+        if self._json_to_dict():
             from datetime import datetime, timedelta
             from sys import getsizeof
 
@@ -142,7 +186,7 @@ class Datastore:
                     'expiration_time': expiration_time
                 }
                 self.db_data[key] = (obj, meta_data)
-            if not self.dict_to_json():
+            if not self._dict_to_json():
                 return False
             print("Object created with ID =", key)
             return True
