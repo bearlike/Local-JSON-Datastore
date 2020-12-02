@@ -9,17 +9,32 @@ class Datastore:
 
     def __init__(self, path: str = "DB.json"):
         """ Class Constructor
-        
+
         Args:
             path (str): Path to the JSON Datastore file
         """
         self.db_path = path
         self.db_data = dict()
 
+    def _lock(self):
+        import os
+        from time import sleep
+        while os.path.isfile(self.db_path+".lock"):
+            print("Another process is using DB.json. Waiting for release.")
+            sleep(1)
+        with open(self.db_path+".lock", 'w') as fp:
+            pass
+
+    def _unlock(self):
+        from os import remove
+        remove(self.db_path + ".lock")
+
     def json_to_dict(self) -> bool:
         try:
+            self._lock()
             with open(self.db_path) as json_file:
                 self.db_data = json.load(json_file)
+            self._unlock()
             return True
         except FileNotFoundError:
             print("The file", self.db_path, "does not exist or inaccessible.")
@@ -34,13 +49,25 @@ class Datastore:
 
     def dict_to_json(self) -> bool:
         try:
+            self._lock()
             with open(self.db_path, "w") as outfile:
                 json.dump(self.db_data, outfile)
+            self._unlock()
             return True
         except:
             return False
 
-    def print_all_objects(self) -> bool:
+    def read(self, key: str):
+        if self.json_to_dict():
+            if key in self.db_data.keys():
+                return(self.db_data[key])
+            else:
+                return False
+        else:
+            return False
+                
+            
+    def _print_all_objects(self) -> bool:
         if self.json_to_dict():
             print(json.dumps(self.db_data, indent=3))
             return True
@@ -48,10 +75,20 @@ class Datastore:
             print("Unable to Print all JSON Objects")
             return False
 
-    def Delete(self, key: int) -> bool:
+    def delete(self, key: str) -> bool:
         if self.json_to_dict():
+            #print(self.db_data[key][1],"hello")
+            curr_time = datetime.now().timestamp()
             try:
+                print(curr_time , self.db_data[key][1]['expiration_time'])
+                if(self.db_data[key][1]['expiration_time']==-1):
+                    self.db_data.pop(key)
+                if (curr_time - self.db_data[key][1]['expiration_time']) < -1:
+                    print("Object Life Expired")
+                    return False
                 self.db_data.pop(key)
+                if not self.dict_to_json():
+                    return False
             except KeyError:
                 print("Object with", key, "does not exist.")
                 return False
@@ -60,20 +97,19 @@ class Datastore:
             print("Unable to delete Object ID =", id)
             return False
 
-    def Create(self, key: str, obj: dict, life: int = -1):
+    def create(self, key: str, obj: dict, life: int = -1):
         """ Create and pushes object to the JSON DS
 
         Args:
             key (str): Primary Key for the $obj 
             obj (dict): The Dictionary object to be pushed
-            life (int, optional): Time in Seconds the key is retained in the DS. Defaults to -1.
+            life (int, optional): Time in Secondsdele the key is retained in the DS. Defaults to -1.
 
         Returns:
             bool: Returns True upon successful insertion
         """
         if self.json_to_dict():
             from datetime import datetime, timedelta
-            from random import randint
             from sys import getsizeof
 
             # Check if the size limit is reached
@@ -86,7 +122,7 @@ class Datastore:
                 print("Object contains Key(s) with more than 32 Characters.")
                 return False
 
-            # Determining Current and Expiration Time 
+            # Determining Current and Expiration Time
             curr_time = datetime.now()
             if life == -1:
                 expiration_time = -1
