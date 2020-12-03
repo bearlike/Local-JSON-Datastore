@@ -13,11 +13,11 @@ A file-based JSON data store exposed as a library that supports CRD operations w
 ### Features
 - A Python package for an user to import and instantiate the class to perform **CRD** operations.
 - 85% Testing Coverage for the application using **PyTest** and deployed on [**Travis CI**](https://travis-ci.com/github/bearlike/Local-JSON-Datastore).
-- **Read, Write and Delet**e operations performed on a custom local data store in a user-specified location.
+- **Read, Write and Delete** operations performed on a custom local data store in a user-specified location.
 - Completely **Thread Safe** between same-user and mult-user processes. 
 - A **lock-unlock mechanism** to make the data store thread safe.
-- Supports **Time-To-Live propert**y through argument **`life`** in **`database.database.Database.create()`**, defines the seconds the key must be retained in the data store. Once `life` for a key has expired, the key will no longer be available for Read or Delete operations.
-- **All Non-Functional Requirements staisfied**
+- Supports **Time-To-Live property** through argument **`life`** in **`database.database.Database.create()`**, defines the seconds the key must be retained in the data store. Once `life` for a key has expired, the key will no longer be available for Read or Delete operations.
+- **All Non-Functional Requirements satisfied**.
 - **All functions inside the package and Unit Test modules have well defined docstring in them.** 
 
 ## Getting Started
@@ -27,7 +27,7 @@ This package required Python 3.x.x to run. Install python from [here](https://ww
 
 ### Getting the package
 
-To get the package clone this repository into your local system and make it the current working directory using the following commands.
+To get the package, clone this repository into your local system and make it the current working directory using the following commands.
 
 ```bash
 git clone https://github.com/bearlike/Local-JSON-Datastore.git
@@ -69,7 +69,7 @@ test_object = {
     'c':'cat',
     'd':'dog'
 }
-is_object_inserted = db.add_obj(key='alphabets', obj=test_object)
+is_object_inserted = db.create(key='alphabets', obj=test_object)
 ```
 
  If an object has to be inserted with a specific **Time-To-Live** it can be passed as a separate argument (in seconds) to the add function. 
