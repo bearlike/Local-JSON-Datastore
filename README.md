@@ -81,7 +81,7 @@ test_object = {
     'c':'cat',
     'd':'dog'
 }
-is_object_inserted = db.add_obj(key='alphabets', obj=test_object, life=100)
+is_object_inserted = db.create(key='alphabets', obj=test_object, life=100)
 ```
 
 #### Deleting an Object
@@ -89,7 +89,7 @@ is_object_inserted = db.add_obj(key='alphabets', obj=test_object, life=100)
 To delete an object that has not crossed its **Time-To-Live** the key of that object can be passed as an argument to the `delete_object()` function. Return `True` if the object has been deleted successfully else a `False`.
 
 ```python
-is_object_deleted = db.delete_object(key='alphabets')
+is_object_deleted = db.delete(key='alphabets')
 ```
 
 #### Retrieve an Object
@@ -97,7 +97,7 @@ is_object_deleted = db.delete_object(key='alphabets')
 To retrieve an object provide the key of the object as an argument to the `get_object()` function.
 
 ```python
-key = db.get_object(key='alphabet')
+key = db.read(key='alphabet')
 print(key)
 ```
 
