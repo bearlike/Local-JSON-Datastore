@@ -11,14 +11,14 @@
 A file-based JSON data store exposed as a library that supports CRD operations with a lock-unlock mechanism to establish a thread-safe environment.
 
 ### Features
-- A Python package for an user to import and instantiate the class to perform **CRD** operations.
+- A Python package for a user to import and instantiate the class to perform **CRD** operations.
 - 85% Testing Coverage for the application using **PyTest** and deployed on [**Travis CI**](https://travis-ci.com/github/bearlike/Local-JSON-Datastore).
 - **Read, Write and Delete** operations performed on a custom local data store in a user-specified location.
-- Completely **Thread Safe** between same-user and mult-user processes. 
-- A **lock-unlock mechanism** to make the data store thread safe.
-- Supports **Time-To-Live property** through argument **`life`** in **`database.database.Database.create()`**, defines the seconds the key must be retained in the data store. Once `life` for a key has expired, the key will no longer be available for Read or Delete operations.
+- Completely **Thread-Safe** between same-user and multi-user processes. 
+- A **lock-unlock mechanism** to make the data store thread-safe.
+- Supports **Time-To-Live property** through argument **`life`** in **`datastore.datastore.Datastore.create()`**, defines the seconds the key must be retained in the data store. Once `life` for a key has expired, the key will no longer be available for Reading or Delete operations.
 - **All Non-Functional Requirements satisfied**.
-- **All functions inside the package and Unit Test modules have well defined docstring in them.** 
+- **All functions inside the package and Unit Test modules have well-defined docstring in them.** 
 
 ## Getting Started
 ### Requirements
@@ -46,7 +46,7 @@ import datastore
 
 #### Creating an object
 
-By default an object is created with the storage file called `DB.json` in the root of the present working directory as follows.
+By default, an object is created with the storage file called `DB.json` in the root of the present working directory as follows.
 
 ```python
 db = datastore.Datastore()
@@ -86,7 +86,7 @@ is_object_inserted = db.create(key='alphabets', obj=test_object, life=100)
 
 #### Deleting an Object
 
-To delete an object that has not crossed its **Time-To-Live** the key of that object can be passed as an argument to the `delete_object()` function. Return `True` if the object has been deleted successfully else a `False`.
+To delete an object that has not crossed its **Time-To-Live** the key of that object can be passed as an argument to the `delete_object()` function. Return `true` if the object has been deleted successfully else a `False`.
 
 ```python
 is_object_deleted = db.delete(key='alphabets')
